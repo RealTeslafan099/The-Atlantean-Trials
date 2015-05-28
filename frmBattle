@@ -1,0 +1,318 @@
+Public Module GlobalVariables
+    Public blnEnemyDead As Boolean
+    Public blnSharkDead As Boolean
+    Public blnEelDead As Boolean
+    Public blnSerpentDead As Boolean
+    Public blnKrakenDead As Boolean
+End Module
+Public Class frmBattle
+
+    Dim intActive As Integer
+    Public strEnemyType As String = "DRAGON" 'This is the kind of enemy you are fighting. As there is only one enemy at the moment(the dragon), it is set to dragon but change it later when you have more enemies.
+    Dim intEnemyHealth As Integer
+    Dim intModEnemyHealth As Integer
+    Public strArmorType As String
+    Dim intCharacterHealth As Integer
+    Dim intModCharacterHealth As Integer
+    Dim blnPlayerAlive As Boolean
+    Dim blnEnemyAlive As Boolean
+    'How to use public variables between forms:
+    'Public blnTest As Boolean
+    'If frmBattle.blnTest = True Then
+
+
+
+    'FORM ACTIVATED--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    '---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    Private Sub frmMain_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+
+        picFireball.Visible = False
+        Call EnemyHealth(strEnemyType, intEnemyHealth)
+        intModEnemyHealth = intEnemyHealth
+        timDragonAttack.Enabled = True
+        strArmorType = "SKIN"
+        intCharacterHealth = PlayerHealth(strArmorType)
+        Me.lblCharacterHealth.Text = 100
+        Me.lblEnemyHealth.Text = 100
+        intModCharacterHealth = intCharacterHealth
+        blnPlayerAlive = True
+        blnEnemyAlive = True
+        timDeath.Enabled = True
+
+
+
+
+    End Sub
+
+    'END ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    ' btnAttack CLICK ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    '---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    Private Sub btnAttack_Click(sender As Object, e As EventArgs) Handles btnAttack.Click
+        Dim intDamage As Integer
+        Dim sngHealthBarReduction As Single
+
+        Dim intWeapon As Integer = 1
+
+        timHandAttack.Enabled = True
+
+
+        'This is the damage done to the enemy scaled to the health of the enemy because the health bar can only take a max of 100.  
+        'eg: an enemy has 1000 health. The health would need to be divided by 10 so it could fit in the bar of 100, thus the attack damage
+        'Would need to be scaled as well so it looks more realistic. So it would be divided by 10. The attack and Health integers stay the same, 
+        'but to fit them in the progress bars they are assigned a modified value.
+
+        'HEALTH BAR CODE -----------------------
+        If blnEnemyAlive And blnPlayerAlive Then
+            Call AttackDamage(intWeapon, intDamage, intEnemyHealth, sngHealthBarReduction, blnPlayerAlive)
+        End If
+        Me.lblDamage.Text = intDamage
+        intModEnemyHealth = intModEnemyHealth - intDamage
+        If intModEnemyHealth > 0 Then
+            Me.prgEnemyHealth.Value = Me.prgEnemyHealth.Value - sngHealthBarReduction
+        Else
+            Me.btnAttack.Enabled = False
+            Me.prgEnemyHealth.Value = 0
+            intModEnemyHealth = 0
+            blnEnemyAlive = False
+            Call EnemyDead(strEnemyType, blnSharkDead, blnEelDead, blnSerpentDead, blnKrakenDead)
+            ' blnEnemyDead = True
+            Me.picEnemy.Image = My.Resources.explosion
+            timExplosion.Enabled = True
+
+            
+        End If
+
+        Me.lblEnemyHealth.Text = intModEnemyHealth
+        'X---------------------------------------
+
+
+
+
+    End Sub
+    'END ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    'TIMER FOR YOUR ATTACK ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    Private Sub timHandAttack_Tick(sender As Object, e As EventArgs) Handles timHandAttack.Tick
+
+        If blnPlayerAlive And blnEnemyAlive Then
+            Dim blnStopAttackMovement As Boolean
+            Static blnGoingUp As Boolean
+            Static blnTemp As Boolean
+            If blnTemp = False Then
+                blnGoingUp = True
+            End If
+
+
+            blnStopAttackMovement = False
+            If picHand.Top <= 250 And blnGoingUp = True Then
+                picHand.Top -= 5
+            End If
+            If blnGoingUp = False Then
+                picHand.Top += 5
+            End If
+
+            If picHand.Top <= 200 Then
+                blnGoingUp = False
+                blnTemp = True
+            End If
+            If picHand.Top >= 245 And blnGoingUp = False Then
+                blnStopAttackMovement = True
+            End If
+            If blnStopAttackMovement = True Then
+                picHand.Top = 245
+            End If
+
+            If blnStopAttackMovement = True Then
+                blnTemp = False
+                timHandAttack.Enabled = False
+
+            End If
+        End If
+
+    End Sub
+    ' END -------------------------------------------------------------------------------------------
+    '  -------------------------------------------------------------------------------------------
+
+    ' Timer For DRAGON ATTACK -------------------------------------------------------------------------------------------
+    ' -------------------------------------------------------------------------------------------
+
+    Private Sub timDragonAttack_Tick(sender As Object, e As EventArgs) Handles timDragonAttack.Tick
+
+        Static intEnemyAttackInterval As Integer
+        Static intTicks As Integer
+        Static blnNewInterval As Boolean
+        Const intFASTESTINTERVAL As Integer = 20 'Smallest possible number of ticks before enemy can attack again
+        Const intSLOWESTINTERVAL As Integer = 50 'Largest possible number of ticks before enemy can attack again
+        Dim intEnemyDamage As Integer
+
+        Dim intEnemyWeapon As Integer = 2
+        Dim intEnemyAttackScaled As Integer
+        If blnPlayerAlive = True And blnEnemyAlive = True Then
+            If intTicks = 0 Then
+                blnNewInterval = True
+            End If
+            If blnNewInterval = True Then
+
+                Randomize()
+                intEnemyAttackInterval = (intFASTESTINTERVAL - intSLOWESTINTERVAL + 1) * Rnd() + intSLOWESTINTERVAL
+                blnNewInterval = False
+            End If
+            If intTicks = intEnemyAttackInterval Then
+
+                picFireball.Top += 5
+                picFireball.Visible = True
+
+                If picFireball.Top = 310 Then
+                    picFireball.Visible = False
+                    picFireball.Top = 110
+                End If
+                If picFireball.Visible = False Then
+                    Call AttackDamage(intEnemyWeapon, intEnemyDamage, intCharacterHealth, intEnemyAttackScaled, blnEnemyAlive)
+
+                    intModCharacterHealth = intModCharacterHealth - intEnemyDamage
+                    If intModCharacterHealth > 0 Then
+                        prgCharacterHealth.Value = prgCharacterHealth.Value - intEnemyAttackScaled
+                    Else
+                        prgCharacterHealth.Value = 0
+                        intModCharacterHealth = 0
+                        Me.picHand.Image = My.Resources.explosion
+                        timExplosion.Enabled = True
+                        blnPlayerAlive = False
+                        MessageBox.Show("You Died!", "GAME OVER")
+                        ' Me.Visible = False
+                        ' Me.Close()
+                        frmMain.Visible = True
+                        frmMain.Enabled = False
+                        frmMain.Close()
+
+                    End If
+                    Me.lblCharacterHealth.Text = intModCharacterHealth
+                    intTicks = 0
+                End If
+            Else
+                intTicks = intTicks + 1
+            End If
+        End If
+
+    End Sub
+
+    ' END ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    '---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    'YOUR ATTACK DAMAGE PROCEDURE ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    Sub AttackDamage(ByVal intWeapon As Integer, ByRef intDamage As Integer, ByVal intHealth As Integer, ByRef intDamageScaled As Integer, ByVal blnAlive As Boolean)
+
+        Dim intDamageRandomizer As Integer
+        Const intMAXDAMAGE As Integer = 10
+        Const intMINDAMAGE As Integer = 0
+        Randomize()
+
+        intDamageRandomizer = (intMAXDAMAGE - intMINDAMAGE + 1) * Rnd() + intMINDAMAGE
+        Select Case intWeapon
+            Case 1
+                intDamage = 1 * intDamageRandomizer
+            Case 2
+                intDamage = 1.5 * intDamageRandomizer
+            Case 3
+                intDamage = 2 * intDamageRandomizer
+            Case 4
+                intDamage = 2.5 * intDamageRandomizer
+            Case 5
+                intDamage = 3 * intDamageRandomizer
+        End Select
+        intDamageScaled = intDamage / (intHealth / 100)
+        If blnAlive = False Then
+            intDamage = 0
+            intDamageScaled = 0
+        End If
+
+    End Sub
+
+    ' END ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    'ENEMY HEALTH ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    Sub EnemyHealth(ByVal strEnemy As String, ByRef intEnemyHealth As Integer)
+        Select Case strEnemy
+            Case "SHARK"
+                intEnemyHealth = 100
+            Case "EEL"
+                intEnemyHealth = 200
+            Case "SERPENT"
+                intEnemyHealth = 300
+            Case "KRAKEN"
+                intEnemyHealth = 500
+        End Select
+
+    End Sub
+
+    '  END ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ' ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
+    Public Function PlayerHealth(ByVal strArmor As String) As Integer
+        Dim intArmorHitpointsAdded As Integer
+        Dim intTotalHitpoints As Integer
+        Select Case strArmor
+            Case "LEATHER"
+                intArmorHitpointsAdded = 20
+            Case "IRON"
+                intArmorHitpointsAdded = 40
+            Case "SERPENTSCALES"
+                intArmorHitpointsAdded = 150
+            Case "SKIN"
+                intArmorHitpointsAdded = 0
+        End Select
+        intTotalHitpoints = 100 + intArmorHitpointsAdded
+        Return intTotalHitpoints
+    End Function
+
+    Private Sub timExplosion_Tick(sender As Object, e As EventArgs) Handles timExplosion.Tick
+        Static intDecisecondCounter As Integer
+        Me.picFireball.Visible = False
+        Me.picHand.Top = 245
+        intDecisecondCounter = intDecisecondCounter + 1
+
+        If intDecisecondCounter = 7 And blnPlayerAlive = False Then
+            Me.picHand.Visible = False
+            Me.Visible = False
+            Me.Close()
+            frmMain.Visible = True
+            timExplosion.Enabled = False
+
+        ElseIf intDecisecondCounter = 7 And blnEnemyAlive = False Then
+            Me.picEnemy.Visible = False
+            timExplosion.Enabled = False
+            Me.Visible = False
+            Me.Close()
+            frmMain.Visible = True
+        End If
+    End Sub
+
+    Private Sub EnemyDead(ByVal strEnemy As String, ByRef blnSharkDead As Boolean, ByRef blnEelDead As Boolean, _
+                         ByRef blnSerpentDead As Boolean, ByRef blnKrakenDead As Boolean)
+        If strEnemy = "SHARK" Then
+            blnSharkDead = True
+        ElseIf strEnemy = "EEL" Then
+            blnEelDead = True
+        ElseIf strEnemy = "SERPENT" Then
+            blnSerpentDead = True
+        ElseIf strEnemy = "KRAKEN" Then
+            blnKrakenDead = True
+        End If
+    End Sub
+
+End Class
