@@ -1,0 +1,302 @@
+Public Class frmMain
+
+    Dim intLocation As Integer
+    Dim strLocationDescription As String
+    Dim strLegalDirections As String
+    Dim intLocationToNorth As Integer
+    Dim intLocationToEast As Integer
+    Dim intLocationToSouth As Integer
+    Dim intLocationToWest As Integer
+    Dim blnInBattle As Boolean
+    Private Sub btnUseItem_Click(sender As Object, e As EventArgs) Handles btnUseItem.Click
+
+        Dim strCurrentItem As String
+        Dim strCurrentArmor As String
+
+        strCurrentItem = PerformEquipCommand()
+        strCurrentArmor = PerformEquipCommand()
+
+        Select Case strCurrentItem
+            Case "Rock"
+                MessageBox.Show("Rock Equipped: Damage * 1.5", "Item Equipped")
+                Me.lblEquippedItem.Text = "Equipped Item: " & strCurrentItem
+                intWeapon = 2
+            Case "Shark Tooth"
+                MessageBox.Show("Shark Tooth Equipped: Damage * 2", "Item Equipped")
+                Me.lblEquippedItem.Text = "Equipped Item: " & strCurrentItem
+                intWeapon = 3
+            Case "Harpoon"
+                MessageBox.Show("Harpoon Equipped: Damage * 2.5", "Item Equipped")
+                Me.lblEquippedItem.Text = "Equipped Item: " & strCurrentItem
+                intWeapon = 4
+            Case "Trident"
+                MessageBox.Show("Trident Equipped: Damage * 3", "Item Equipped")
+                Me.lblEquippedItem.Text = "Equipped Item: " & strCurrentItem
+                intWeapon = 5
+        End Select
+
+        Select Case strCurrentArmor
+            Case "Rubber Gloves"
+                MessageBox.Show("Rubber Gloves Equipped: Immunity to electricity", "Item Equipped")
+                Me.lblEquippedArmor.Text = "Equipped Armor: " & strCurrentArmor
+                strArmorType = "RUBBERGLOVES"
+            Case "Serpent Scales"
+                MessageBox.Show("Serpent Scales Equipped: Health + 150", "Item Equipped")
+                Me.lblEquippedArmor.Text = "Equipped Armor: " & strCurrentArmor
+                strArmorType = "SERPENTSCALES"
+        End Select
+
+
+
+
+    End Sub
+
+    'ITEMS-------------------------------------------------------------------------------------
+    '------------------------------------------------------------------------------------------------
+    ' Private Sub lblRubberGloves_Click(sender As Object, e As EventArgs) Handles lblRubberGloves.Click
+    '      ItemsList.Items.Add("Rubber Gloves")
+    '      Me.lblRubberGloves.Visible = False
+    '  End Sub
+
+    '  Private Sub lblSerpentScales_Click(sender As Object, e As EventArgs) Handles lblSerpentScales.Click
+    '    ItemsList.Items.Add("Serpent Scales")
+    '     Me.lblSerpentScales.Visible = False
+    '  End Sub
+
+    '  Private Sub lblSharkTooth_Click(sender As Object, e As EventArgs) Handles lblSharkTooth.Click
+    '     ItemsList.Items.Add("Shark Tooth")
+    '      Me.lblSharkTooth.Visible = False
+    '  End Sub
+
+    '  Private Sub lblRock_Click(sender As Object, e As EventArgs) Handles lblRock.Click
+    '      ItemsList.Items.Add("Rock")
+    '      Me.lblRock.Visible = False
+    '  End Sub
+    '
+    '   Private Sub lblHarpoon_Click(sender As Object, e As EventArgs) Handles lblHarpoon.Click
+    '      ItemsList.Items.Add("Harpoon")
+    '      Me.lblHarpoon.Visible = False
+    '   End Sub
+
+    '   Private Sub lblWorm_Click(sender As Object, e As EventArgs) Handles lblWorm.Click
+    '       ItemsList.Items.Add("Worm")
+    '      Me.lblWorm.Visible = False
+    '  End Sub
+
+    '  Private Sub lblKey_Click(sender As Object, e As EventArgs) Handles lblKey.Click
+    '       ItemsList.Items.Add("Key")
+    '     Me.lblKey.Visible = False
+    ' End Sub
+
+    ' Private Sub lblTrident_Click(sender As Object, e As EventArgs) Handles lblTrident.Click
+    '      ItemsList.Items.Add("Trident")
+    '      Me.lblTrident.Visible = False
+    '----------------------------------------------------------------------------------------
+    '-------------------------------------------------------------------------------------------
+
+    Public Function PerformEquipCommand() As String
+
+        Dim strSelectedItem As String
+        strSelectedItem = ItemsList.SelectedItem
+        Return strSelectedItem
+
+    End Function
+    Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
+        intLocation = 16
+        strLegalDirections = "You can go " & PossibleDirections(intLocation)
+        Me.lstEvents.Text = Me.lstEvents.Text + strLocationDescription + vbCrLf + strLegalDirections
+        picScenery.Image = My.Resources.Room16
+        blnInBattle = False
+        frmBattle.Visible = False
+
+
+    End Sub
+    Private Sub btnNorth_Click(sender As Object, e As EventArgs) Handles btnNorth.Click
+        Call getLocationToNorth(intLocation, intLocationToNorth)
+        If intLocationToNorth > 0 Then
+            intLocation = intLocation - 4
+        Else
+            printMessage("You can't go that way!" & vbCrLf & vbCrLf & vbCrLf)
+        End If
+        Call LocationDescriptionAndImage()
+    End Sub
+
+    Private Sub btnEast_Click(sender As Object, e As EventArgs) Handles btnEast.Click
+        Call getLocationToEast(intLocation, intLocationToEast)
+        If intLocationToEast > 0 Then
+            intLocation = intLocation + 1
+        Else
+            printMessage("You can't go that way!" & vbCrLf & vbCrLf & vbCrLf)
+        End If
+        Call LocationDescriptionAndImage()
+    End Sub
+    Private Sub btnSouth_Click(sender As Object, e As EventArgs) Handles btnSouth.Click
+        Call getLocationToSouth(intLocation, intLocationToSouth)
+        If intLocationToSouth > 0 Then
+            intLocation = intLocation + 4
+        Else
+            printMessage("You can't go that way!" & vbCrLf & vbCrLf & vbCrLf)
+        End If
+        Call LocationDescriptionAndImage()
+    End Sub
+
+    Private Sub btnWest_Click(sender As Object, e As EventArgs) Handles btnWest.Click
+        Call getLocationToWest(intLocation, intLocationToWest)
+        If intLocationToWest > 0 Then
+            intLocation = intLocation - 1
+        Else
+            printMessage("You can't go that way!" & vbCrLf & vbCrLf)
+        End If
+        Call LocationDescriptionAndImage()
+    End Sub
+
+
+    Private Sub LocationDescriptionAndImage()
+        Select Case intLocation
+            Case 1
+                printMessage("You are in a secret room!")
+            Case 2
+                printMessage("You are in an impresive hallway. You hear gurgling sounds ahead")
+            Case 3
+                printMessage("You are in a room filled halfway with water" & vbCrLf & _
+                             "You hear wriggling noises. You look down to see a dirt mound" & _
+                             "covered in fluorescent worms." & vbCrLf & "To your right there" & _
+                             "is a door with a strange keypad on it, covered in numbers")
+            Case 4
+                If blnSerpentDead = False Then
+                    printMessage("You are in a vast room and in the center there is a sea serpent sitting" & _
+                             "atop an enormous pile of treasure!")
+                    frmBattle.strEnemyType = "SERPENT"
+                    frmBattle.Visible = True
+                    Me.Visible = False
+                ElseIf blnSerpentDead = True Then
+                    printMessage("You see a dead serpent atop a huge pile of treasure")
+                End If
+
+            Case 5
+                printMessage("Arg! It's a trap!")
+            Case 6
+                If blnSerpentDead = False Then
+                    printMessage("You see the kraken guarding the biggest door you've ever seen!")
+                    frmBattle.strEnemyType = "KRAKEN"
+                    frmBattle.Visible = True
+                    Me.Visible = False
+                ElseIf blnKrakenDead = True Then
+                    printMessage("The Kraken is defeated! Atlantis awaits!")
+                End If
+
+            Case 7
+                printMessage("You enter the shipwreck. It's boards are old and broken and covered in seaweed " & _
+                             "from years of being underwater.")
+            Case 8
+
+                If blnSharkDead = False Then
+                    printMessage("You see a shark! To your left there is a shipwreck")
+                    frmBattle.strEnemyType = "SHARK"
+                    frmBattle.Visible = True
+                    Me.Visible = False
+                ElseIf blnSharkDead = True Then
+                    printMessage("You see a dead shark! To your left there is a shipwreck")
+                End If
+
+
+            Case 9
+                printMessage("just a boring old passageway")
+            Case 10
+                printMessage("You are in a dark cave. This must have been the eels den")
+            Case 11
+                printMessage("You enter the captain's quarters and see a treasure chest!")
+            Case 12
+
+                printMessage("You are in a passage way." & vbCrLf & "You see an ancient message scrwaled on the wall" _
+                            & vbCrLf & "It reads: Sometimes what's in plain sight is the most hidden")
+            Case 13
+                printMessage("You are in a very eerie cavern")
+            Case 14
+                If blnEelDead = False Then
+                    printMessage("You see an electric eel!")
+                    frmBattle.strEnemyType = "EEL"
+                    frmBattle.Visible = True
+                    Me.Visible = False
+                ElseIf blnEelDead = True Then
+                    printMessage("You see a dead eel")
+                End If
+
+            Case 15
+                printMessage("You are in a passage way." & vbCrLf & "You see an ancient message scrwaled on the wall" _
+                            & vbCrLf & "It reads: Beware! Electricity is deadly")
+            Case 16
+                printMessage("You are at the entrance of the labyrinth.")
+                picScenery.Image = My.Resources.Room16
+
+        End Select
+    End Sub
+    Function PossibleDirections(ByVal intLocation As Integer) As String
+        Dim intRoomToNorth As Integer
+        Dim intRoomToEast As Integer
+        Dim intRoomToSouth As Integer
+        Dim intRoomToWest As Integer
+        Dim strPossibleDirections As String = Nothing
+
+        Call getLocationToNorth(intLocation, intRoomToNorth)
+        If intRoomToNorth > 0 Then
+            strPossibleDirections = strPossibleDirections + "N"
+        End If
+        Call getLocationToEast(intLocation, intRoomToEast)
+        If intRoomToEast > 0 Then
+            strPossibleDirections = strPossibleDirections + "E"
+        End If
+        Call getLocationToSouth(intLocation, intRoomToSouth)
+        If intRoomToSouth > 0 Then
+            strPossibleDirections = strPossibleDirections + "S"
+        End If
+        Call getLocationToWest(intLocation, intRoomToWest)
+        If intRoomToWest > 0 Then
+            strPossibleDirections = strPossibleDirections + "W"
+        End If
+        Return strPossibleDirections
+    End Function
+
+    Sub getLocationToNorth(ByVal intRoomNumber As Integer, ByRef intLocationToNorth As Integer)
+        Select Case intRoomNumber
+            Case 6, 7, 9, 11, 12, 13, 14, 16
+                intLocationToNorth = intRoomNumber - 4
+            Case Else
+                intLocationToNorth = 0
+        End Select
+    End Sub
+    Sub getLocationToEast(ByVal intRoomNumber As Integer, ByRef intLocationToEast As Integer)
+        Select Case intRoomNumber
+            Case 1, 3, 7, 9, 14, 15
+                intLocationToEast = intRoomNumber + 1
+            Case Else
+                intLocationToEast = 0
+        End Select
+    End Sub
+    Sub getLocationToSouth(ByVal intRoomNumber As Integer, ByRef intLocationToSouth As Integer)
+        Select Case intRoomNumber
+            Case 2, 3, 5, 7, 8, 9, 10, 12
+                intLocationToSouth = intRoomNumber + 4
+            Case Else
+                intLocationToSouth = 0
+        End Select
+    End Sub
+    Sub getLocationToWest(ByVal intRoomNumber As Integer, ByRef intLocationToWest As Integer)
+        Select Case intRoomNumber
+            Case 2, 4, 8, 10, 15, 16
+                intLocationToWest = intRoomNumber - 1
+            Case Else
+                intLocationToWest = 0
+        End Select
+    End Sub
+
+
+    Private Sub printMessage(ByVal strMessage As String)
+        Me.lstEvents.Text = Me.lstEvents.Text + vbCrLf + vbCrLf + strMessage
+        Me.lstEvents.SelectionStart = Me.lstEvents.Text.Length
+        Me.lstEvents.ScrollToCaret()
+    End Sub
+
+
+
+End Class
