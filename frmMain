@@ -8,6 +8,9 @@ Public Class frmMain
     Dim intLocationToSouth As Integer
     Dim intLocationToWest As Integer
     Dim blnInBattle As Boolean
+    Dim strCmndInput As String
+    Dim intItemRoom As Integer
+
     Private Sub btnUseItem_Click(sender As Object, e As EventArgs) Handles btnUseItem.Click
 
         Dim strCurrentItem As String
@@ -101,6 +104,7 @@ Public Class frmMain
         Return strSelectedItem
 
     End Function
+
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles Me.Load
         intLocation = 16
         strLegalDirections = "You can go " & PossibleDirections(intLocation)
@@ -110,13 +114,18 @@ Public Class frmMain
         frmBattle.Visible = False
 
 
+
     End Sub
     Private Sub btnNorth_Click(sender As Object, e As EventArgs) Handles btnNorth.Click
         Call getLocationToNorth(intLocation, intLocationToNorth)
         If intLocationToNorth > 0 Then
             intLocation = intLocation - 4
+            btnEast.Enabled = True
+            btnSouth.Enabled = True
+            btnWest.Enabled = True
+            btnNorth.Enabled = True
         Else
-            printMessage("You can't go that way!" & vbCrLf & vbCrLf & vbCrLf)
+            printMessage("You can't go that way!")
         End If
         Call LocationDescriptionAndImage()
     End Sub
@@ -125,8 +134,12 @@ Public Class frmMain
         Call getLocationToEast(intLocation, intLocationToEast)
         If intLocationToEast > 0 Then
             intLocation = intLocation + 1
+            btnEast.Enabled = True
+            btnSouth.Enabled = True
+            btnWest.Enabled = True
+            btnNorth.Enabled = True
         Else
-            printMessage("You can't go that way!" & vbCrLf & vbCrLf & vbCrLf)
+            printMessage("You can't go that way!")
         End If
         Call LocationDescriptionAndImage()
     End Sub
@@ -134,8 +147,12 @@ Public Class frmMain
         Call getLocationToSouth(intLocation, intLocationToSouth)
         If intLocationToSouth > 0 Then
             intLocation = intLocation + 4
+            btnEast.Enabled = True
+            btnSouth.Enabled = True
+            btnWest.Enabled = True
+            btnNorth.Enabled = True
         Else
-            printMessage("You can't go that way!" & vbCrLf & vbCrLf & vbCrLf)
+            printMessage("You can't go that way!")
         End If
         Call LocationDescriptionAndImage()
     End Sub
@@ -144,8 +161,12 @@ Public Class frmMain
         Call getLocationToWest(intLocation, intLocationToWest)
         If intLocationToWest > 0 Then
             intLocation = intLocation - 1
+            btnEast.Enabled = True
+            btnSouth.Enabled = True
+            btnWest.Enabled = True
+            btnNorth.Enabled = True
         Else
-            printMessage("You can't go that way!" & vbCrLf & vbCrLf)
+            printMessage("You can't go that way!")
         End If
         Call LocationDescriptionAndImage()
     End Sub
@@ -160,14 +181,16 @@ Public Class frmMain
             Case 3
                 printMessage("You are in a room filled halfway with water" & vbCrLf & _
                              "You hear wriggling noises. You look down to see a dirt mound" & _
-                             "covered in fluorescent worms." & vbCrLf & "To your right there" & _
-                             "is a door with a strange keypad on it, covered in numbers")
+                             "covered in fluorescent worms." & vbCrLf & "To your right there " & _
+                             "is a door with a strange keypad on it, covered in numbers" & vbCrLf & vbCrLf & _
+                             "Would you like to take some Worms?")
+                intItemRoom = 3
             Case 4
                 If blnSerpentDead = False Then
-                    printMessage("You are in a vast room and in the center there is a sea serpent sitting" & _
-                             "atop an enormous pile of treasure!")
+                    printMessage("That Sea Serpent was no match for your strength!")
                     frmBattle.strEnemyType = "SERPENT"
                     frmBattle.Visible = True
+                    frmBattle.Text = "Sea Serpent!!!"
                     Me.Visible = False
                 ElseIf blnSerpentDead = True Then
                     printMessage("You see a dead serpent atop a huge pile of treasure")
@@ -180,6 +203,7 @@ Public Class frmMain
                     printMessage("You see the kraken guarding the biggest door you've ever seen!")
                     frmBattle.strEnemyType = "KRAKEN"
                     frmBattle.Visible = True
+                    frmBattle.Text = "THE KRAKEN!"
                     Me.Visible = False
                 ElseIf blnKrakenDead = True Then
                     printMessage("The Kraken is defeated! Atlantis awaits!")
@@ -191,9 +215,10 @@ Public Class frmMain
             Case 8
 
                 If blnSharkDead = False Then
-                    printMessage("You see a shark! To your left there is a shipwreck")
+                    printMessage("You have defeated the Shark! To your left there is a shipwreck")
                     frmBattle.strEnemyType = "SHARK"
                     frmBattle.Visible = True
+                    frmBattle.Text = "Shark attack!"
                     Me.Visible = False
                 ElseIf blnSharkDead = True Then
                     printMessage("You see a dead shark! To your left there is a shipwreck")
@@ -205,7 +230,9 @@ Public Class frmMain
             Case 10
                 printMessage("You are in a dark cave. This must have been the eels den")
             Case 11
-                printMessage("You enter the captain's quarters and see a treasure chest!")
+                printMessage("You enter the captain's quarters and see a treasure chest!" & _
+                             "Take a look inside?")
+                intItemRoom = 11
             Case 12
 
                 printMessage("You are in a passage way." & vbCrLf & "You see an ancient message scrwaled on the wall" _
@@ -214,9 +241,10 @@ Public Class frmMain
                 printMessage("You are in a very eerie cavern")
             Case 14
                 If blnEelDead = False Then
-                    printMessage("You see an electric eel!")
+                    printMessage("Looks like those Rubber Gloves were actually useful!")
                     frmBattle.strEnemyType = "EEL"
                     frmBattle.Visible = True
+                    frmBattle.Text = "Electric Eel!"
                     Me.Visible = False
                 ElseIf blnEelDead = True Then
                     printMessage("You see a dead eel")
@@ -226,7 +254,7 @@ Public Class frmMain
                 printMessage("You are in a passage way." & vbCrLf & "You see an ancient message scrwaled on the wall" _
                             & vbCrLf & "It reads: Beware! Electricity is deadly")
             Case 16
-                printMessage("You are at the entrance of the labyrinth.")
+                printMessage("You are at the entrance of the labyrinth." & PossibleDirections(intLocation))
                 picScenery.Image = My.Resources.Room16
 
         End Select
@@ -240,11 +268,11 @@ Public Class frmMain
 
         Call getLocationToNorth(intLocation, intRoomToNorth)
         If intRoomToNorth > 0 Then
-            strPossibleDirections = strPossibleDirections + "N"
+            strPossibleDirections = strPossibleDirections + "N"            
         End If
         Call getLocationToEast(intLocation, intRoomToEast)
         If intRoomToEast > 0 Then
-            strPossibleDirections = strPossibleDirections + "E"
+            strPossibleDirections = strPossibleDirections + "E"            
         End If
         Call getLocationToSouth(intLocation, intRoomToSouth)
         If intRoomToSouth > 0 Then
@@ -254,16 +282,19 @@ Public Class frmMain
         If intRoomToWest > 0 Then
             strPossibleDirections = strPossibleDirections + "W"
         End If
+
         Return strPossibleDirections
     End Function
 
     Sub getLocationToNorth(ByVal intRoomNumber As Integer, ByRef intLocationToNorth As Integer)
         Select Case intRoomNumber
             Case 6, 7, 9, 11, 12, 13, 14, 16
-                intLocationToNorth = intRoomNumber - 4
+                intLocationToNorth = intRoomNumber - 4                
             Case Else
                 intLocationToNorth = 0
+                btnNorth.Enabled = False
         End Select
+
     End Sub
     Sub getLocationToEast(ByVal intRoomNumber As Integer, ByRef intLocationToEast As Integer)
         Select Case intRoomNumber
@@ -271,7 +302,9 @@ Public Class frmMain
                 intLocationToEast = intRoomNumber + 1
             Case Else
                 intLocationToEast = 0
+                btnEast.Enabled = False
         End Select
+
     End Sub
     Sub getLocationToSouth(ByVal intRoomNumber As Integer, ByRef intLocationToSouth As Integer)
         Select Case intRoomNumber
@@ -279,6 +312,7 @@ Public Class frmMain
                 intLocationToSouth = intRoomNumber + 4
             Case Else
                 intLocationToSouth = 0
+                btnSouth.Enabled = False
         End Select
     End Sub
     Sub getLocationToWest(ByVal intRoomNumber As Integer, ByRef intLocationToWest As Integer)
@@ -287,6 +321,7 @@ Public Class frmMain
                 intLocationToWest = intRoomNumber - 1
             Case Else
                 intLocationToWest = 0
+                btnWest.Enabled = False
         End Select
     End Sub
 
@@ -297,6 +332,71 @@ Public Class frmMain
         Me.lstEvents.ScrollToCaret()
     End Sub
 
+    Private Sub DisableButton(ByVal intLocationNorth As Integer, ByVal intLocationEast As Integer, _
+                           ByVal intLocationSouth As Integer, ByVal intLocationWest As Integer)
+        If intLocationNorth > 0 Then
+            btnNorth.Enabled = True
+        Else
+            btnNorth.Enabled = False
+        End If
+        If intLocationEast > 0 Then
+            btnEast.Enabled = True
+        Else
+            btnEast.Enabled = False
+        End If
+        If intLocationSouth > 0 Then
+            btnSouth.Enabled = True
+        Else
+            btnSouth.Enabled = False
+        End If
+        If intLocationWest > 0 Then
+            btnWest.Enabled = True
+        Else
+            btnWest.Enabled = False
+        End If
+    End Sub
+
+    Public Sub txtCmdBox_KeyDown(sender As Object, e As KeyEventArgs) Handles txtCmdBox.KeyDown
+
+        Static intCounterForWorms As Integer
+        Dim intNumOfWorms As Integer
+        Dim intNumOfRbrGlvs As Integer
+
+        If e.KeyCode = Keys.Enter Then
+            strCmndInput = Me.txtCmdBox.Text.ToUpper
+            Me.txtCmdBox.Text = Nothing
+        End If
+
+        Select intItemRoom
+            Case 11
+                intNumOfRbrGlvs = intNumOfRbrGlvs + 1
+                If strCmndInput = "YES" And intNumOfRbrGlvs = 1 Then
+                    MessageBox.Show("Congratulation! You have found some Rubber Gloves!")
+                    Me.ItemsList.Items.Add("Rubber Gloves")
+                ElseIf strCmndInput = "YES" Then
+                    MessageBox.Show("You see nothing inside")
+                End If
+            Case 3
+                If strCmndInput = "YES" Then                    
+                    intNumOfWorms = Val(InputBox("How many Worms would you like to grab?", "Worms"))
+
+                    If intCounterForWorms = 1 Then
+                        MessageBox.Show("The Worms disappeared before you could grab them")
+
+                    ElseIf intNumOfWorms = 1 Then
+                        Me.ItemsList.Items.Add(intNumOfWorms & " Worm")
+                        intCounterForWorms = intCounterForWorms + 1
+
+                    ElseIf intNumOfWorms > 1 And intNumOfWorms <= 20 Then
+                        Me.ItemsList.Items.Add(intNumOfWorms & " Worms")
+                        intCounterForWorms = intCounterForWorms + 1
+                    ElseIf intNumOfWorms > 20 Then
+                        MessageBox.Show("You can't fit that many worms in your pocket")
+                    End If
+                End If
+        End Select
+        strCmndInput = Nothing
+    End Sub
 
 
 End Class
