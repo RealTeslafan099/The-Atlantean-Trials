@@ -359,8 +359,9 @@ Public Class frmMain
     Public Sub txtCmdBox_KeyDown(sender As Object, e As KeyEventArgs) Handles txtCmdBox.KeyDown
 
         Static intCounterForWorms As Integer
+        Static intNumOfRbrGlvs As Integer
         Dim intNumOfWorms As Integer
-        Dim intNumOfRbrGlvs As Integer
+        
 
         If e.KeyCode = Keys.Enter Then
             strCmndInput = Me.txtCmdBox.Text.ToUpper
@@ -369,11 +370,12 @@ Public Class frmMain
 
         Select intItemRoom
             Case 11
-                intNumOfRbrGlvs = intNumOfRbrGlvs + 1
-                If strCmndInput = "YES" And intNumOfRbrGlvs = 1 Then
+                
+                If strCmndInput = "YES" And intNumOfRbrGlvs = 0 Then
                     MessageBox.Show("Congratulation! You have found some Rubber Gloves!")
                     Me.ItemsList.Items.Add("Rubber Gloves")
-                ElseIf strCmndInput = "YES" Then
+                    intNumOfRbrGlvs = intNumOfRbrGlvs + 1
+                ElseIf strCmndInput = "YES" And intNumOfRbrGlvs > 0 Then
                     MessageBox.Show("You see nothing inside")
                 End If
             Case 3
