@@ -4,6 +4,8 @@ Public Module GlobalVariables
     Public blnEelDead As Boolean
     Public blnSerpentDead As Boolean
     Public blnKrakenDead As Boolean
+    Public intWeapon As Integer = 1
+    Public strArmorType As String
 End Module
 Public Class frmBattle
 
@@ -11,11 +13,12 @@ Public Class frmBattle
     Public strEnemyType As String = "DRAGON" 'This is the kind of enemy you are fighting. As there is only one enemy at the moment(the dragon), it is set to dragon but change it later when you have more enemies.
     Dim intEnemyHealth As Integer
     Dim intModEnemyHealth As Integer
-    Public strArmorType As String
+
     Dim intCharacterHealth As Integer
     Dim intModCharacterHealth As Integer
     Dim blnPlayerAlive As Boolean
     Dim blnEnemyAlive As Boolean
+
     'How to use public variables between forms:
     'Public blnTest As Boolean
     'If frmBattle.blnTest = True Then
@@ -33,7 +36,7 @@ Public Class frmBattle
         strArmorType = "SKIN"
         intCharacterHealth = PlayerHealth(strArmorType)
         Me.lblCharacterHealth.Text = 100
-        Me.lblEnemyHealth.Text = 100
+        Me.lblEnemyHealth.Text = intModEnemyHealth
         intModCharacterHealth = intCharacterHealth
         blnPlayerAlive = True
         blnEnemyAlive = True
@@ -53,7 +56,7 @@ Public Class frmBattle
         Dim intDamage As Integer
         Dim sngHealthBarReduction As Single
 
-        Dim intWeapon As Integer = 1
+
 
         timHandAttack.Enabled = True
 
@@ -111,6 +114,7 @@ Public Class frmBattle
             blnStopAttackMovement = False
             If picHand.Top <= 250 And blnGoingUp = True Then
                 picHand.Top -= 5
+                btnAttack.Enabled = False
             End If
             If blnGoingUp = False Then
                 picHand.Top += 5
@@ -125,6 +129,7 @@ Public Class frmBattle
             End If
             If blnStopAttackMovement = True Then
                 picHand.Top = 245
+                btnAttack.Enabled = True
             End If
 
             If blnStopAttackMovement = True Then
@@ -150,7 +155,20 @@ Public Class frmBattle
         Const intSLOWESTINTERVAL As Integer = 50 'Largest possible number of ticks before enemy can attack again
         Dim intEnemyDamage As Integer
 
-        Dim intEnemyWeapon As Integer = 2
+        Dim intEnemyWeapon As Integer
+
+        Select Case strEnemyType
+            Case "SHARK"
+                intEnemyWeapon = 1
+            Case "EEL"
+                intEnemyWeapon = 2
+            Case "SERPENT"
+                intEnemyWeapon = 3
+            Case "KRAKEN"
+                intEnemyWeapon = 4
+
+        End Select
+
         Dim intEnemyAttackScaled As Integer
         If blnPlayerAlive = True And blnEnemyAlive = True Then
             If intTicks = 0 Then
@@ -263,7 +281,7 @@ Public Class frmBattle
     Private Sub frmMain_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
     End Sub
-    Public Function PlayerHealth(ByVal strArmor As String) As Integer
+    Private Function PlayerHealth(ByVal strArmor As String) As Integer
         Dim intArmorHitpointsAdded As Integer
         Dim intTotalHitpoints As Integer
         Select Case strArmor
